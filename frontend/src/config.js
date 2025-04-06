@@ -5,6 +5,7 @@ export const CLIENT_SECRET = ""
 
 export const AGRIWEBB_BASE_API = ""
 export const AGRIWEBB_AUTHORIZAtION_URL = "https://auth.agriwebb.com/oauth2/authorize"
+export const AGRIWEBB_TOKEN_URL = "https://auth.agriwebb.com/oauth2/token"
 
 
 
