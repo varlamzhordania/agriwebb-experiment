@@ -44,6 +44,10 @@ class Record(models.Model):
         abstract = True
 
 
+class AnimalRecord(Record):
+    pass
+
+
 class SharedAgeClassChoices(models.TextChoices):
     CALF = "calf", _("Calf")
     HEIFERCALF = "heifer_calf", _("Heifer Calf")
@@ -89,7 +93,7 @@ class SharedSpeciesChoices(models.TextChoices):
     DEER = "deer", _("Deer")
 
 
-class Animal(Record):
+class Animal(models.Model):
     animal_id = models.IntegerField(
         verbose_name=_('Animal ID'),
         primary_key=False,
@@ -158,17 +162,82 @@ class Animal(Record):
         on_delete=models.SET_NULL,
         help_text=_('Enterprise ID on the agriwebb'),
     )
-    state = AnimalState;
-    records?: AnimalRecord[];
-    farmId?: string;
-    purchasedFrom?: string;
-    purchaseLocationId?: string;
-    creationRecordGroupId?: string;
-    creationRecordId?: string;
-    birthingRecordId?: string;
-    purchaseRecordId?: string;
-    saleRecordId?: string;
-    _observationDate?: Timestamp;
+    state = models.ForeignKey(
+        "AnimalState",
+        verbose_name=_('State'),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text=_('State on the agriwebb'),
+    )
+    records = models.ManyToManyField(
+        AnimalRecord,
+        verbose_name=_('Records'),
+        blank=True,
+        help_text=_('Animal Record on the agriwebb, '),
+    )
+    farm_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Farm ID'),
+        blank=True,
+        null=True,
+        help_text=_('Farm ID on the agriwebb'),
+    )
+    purchased_from = models.CharField(
+        max_length=255,
+        verbose_name=_('Purchased From'),
+        blank=True,
+        null=True,
+        help_text=_('Purchased From on the agriwebb'),
+    )
+    purchase_location_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Purchase Location ID'),
+        blank=True,
+        null=True,
+        help_text=_('Purchase Location ID on the agriwebb'),
+    )
+    creation_record_group_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Creation Record Group ID'),
+        blank=True,
+        null=True,
+        help_text=_('Creation Record Group ID on the agriwebb'),
+    )
+    creation_record_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Creation Record ID'),
+        blank=True,
+        null=True,
+        help_text=_('Creation Record ID on the agriwebb'),
+    )
+    birthing_record_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Birth Record ID'),
+        blank=True,
+        null=True,
+        help_text=_('Birth Record ID on the agriwebb'),
+    )
+    purchase_record_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Purchase Record ID'),
+        blank=True,
+        null=True,
+        help_text=_('Purchase Record ID on the agriwebb'),
+    )
+    sale_record_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Sale Record ID'),
+        blank=True,
+        null=True,
+        help_text=_('Sale Record ID on the agriwebb'),
+    )
+    _observation_date = models.DateTimeField(
+        verbose_name=_('Observation Date'),
+        blank=True,
+        null=True,
+        help_text=_('Observation Date on the agriwebb'),
+    )
 
 
 class AnimalIdentity(models.Model):
