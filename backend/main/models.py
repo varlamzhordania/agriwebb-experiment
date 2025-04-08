@@ -284,6 +284,7 @@ class AnimalIdentity(models.Model):
         help_text=_('Tattoo on the agriwebb'),
     )
     tags = models.ManyToManyField(
+        "AnimalTag",
         verbose_name=_('Tags'),
         blank=True,
         help_text=_(
