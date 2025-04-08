@@ -82,6 +82,13 @@ class SharedAgeClassChoices(models.TextChoices):
     UNKNOWN = "unknown", _("Unknown")
 
 
+class SharedSpeciesChoices(models.TextChoices):
+    CATTLE = "cattle", _("Cattle")
+    SHEEP = "sheep", _("Sheep")
+    GOATS = "goats", _("Goats")
+    DEER = "deer", _("Deer")
+
+
 class Animal(Record):
     animal_id = models.IntegerField(
         verbose_name=_('Animal ID'),
@@ -121,6 +128,47 @@ class Animal(Record):
         on_delete=models.SET_NULL,
         help_text=_('Parentage on the agriwebb'),
     )
+    management_group_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Management Group ID'),
+        blank=True,
+        null=True,
+        help_text=_('Management Group ID on the agriwebb'),
+    )
+    management_group = models.ForeignKey(
+        "ManagementGroup",
+        verbose_name=_('Management Group'),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Management Group on the agriwebb'),
+    )
+    enterprise_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Enterprise ID'),
+        blank=True,
+        null=True,
+        help_text=_('Enterprise ID on the agriwebb'),
+    )
+    enterprise = models.ForeignKey(
+        "Enterprise",
+        verbose_name=_('Enterprise'),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Enterprise ID on the agriwebb'),
+    )
+    state = AnimalState;
+    records?: AnimalRecord[];
+    farmId?: string;
+    purchasedFrom?: string;
+    purchaseLocationId?: string;
+    creationRecordGroupId?: string;
+    creationRecordId?: string;
+    birthingRecordId?: string;
+    purchaseRecordId?: string;
+    saleRecordId?: string;
+    _observationDate?: Timestamp;
 
 
 class AnimalIdentity(models.Model):
@@ -330,12 +378,6 @@ class AnimalCharacteristics(models.Model):
         FEMALE = "female", _("Female")
         UNSPECIFIED = "unspecified", _("Unspecified")
 
-    class SpeciesChoices(models.TextChoices):
-        CATTLE = "cattle", _("Cattle")
-        SHEEP = "sheep", _("Sheep")
-        GOATS = "goats", _("Goats")
-        DEER = "deer", _("Deer")
-
     age_class = models.CharField(
         max_length=255,
         choices=SharedAgeClassChoices.choices,
@@ -406,7 +448,7 @@ class AnimalCharacteristics(models.Model):
         verbose_name=_('Species Common Name'),
         blank=True,
         null=True,
-        choices=SpeciesChoices.choices,
+        choices=SharedSpeciesChoices.choices,
     )
 
 
@@ -520,4 +562,398 @@ class Parentage(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+
+
+class ManagementGroup(models.Model):
+    management_group_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Management Group ID'),
+        null=False,
+        blank=False,
+        help_text=_('Management Group ID on the agriwebb,Internal ID in agriwebb'),
+    )
+    enterprise_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Enterprise ID'),
+        null=True,
+        blank=True,
+        help_text=_('Enterprise ID on the agriwebb'),
+    )
+    farm_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Farm ID'),
+        null=True,
+        blank=True,
+        help_text=_('Farm ID on the agriwebb'),
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_('Name'),
+        null=True,
+        blank=True,
+        help_text=_('Name of the management group on the agriwebb'),
+    )
+    species = models.CharField(
+        max_length=20,
+        choices=SharedSpeciesChoices.choices,
+        verbose_name=_('Species'),
+        null=True,
+        blank=True,
+        help_text=_('Species name on the agriwebb'),
+    )
+    type = models.CharField(
+        max_length=255,
+        verbose_name=_('Type'),
+        null=True,
+        blank=True,
+        help_text=_('Type of the management group on the agriwebb'),
+    )
+    enterprise = models.ForeignKey(
+        "Enterprise",
+        verbose_name=_('Enterprise'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+
+class Enterprise(models.Model):
+    enterprise_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Internal Enterprise ID'),
+        null=False,
+        blank=False,
+        help_text=_('Enterprise ID on the agriwebb, Internal ID in agriwebb'),
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_('Name'),
+        null=True,
+        blank=True,
+        help_text=_('Name of the enterprise on the agriwebb'),
+    )
+    farm_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Farm ID'),
+        null=True,
+        blank=True,
+        help_text=_('Farm ID on the agriwebb'),
+    )
+
+
+class AnimalState(models.Model):
+    class FateChoices(models.TextChoices):
+        ALIVE = "Alive", _("Alive")
+        DEAD = "Dead", _("Dead")
+        SOLD = "Sold", _("Sold")
+        INTRANSIT = "InTransit", _("InTransit")
+
+    class FertilityStatusChoices(models.TextChoices):
+        UNKNOWN = "Unknown", _("Unknown")
+        FERTILE = "Fertile", _("Fertile")
+        INFERTILE = "Infertile", _("Infertile")
+        NEUTERED = "Neutered", _("Neutered")
+        CRYPTORCHID = "Cryptorchid", _("Cryptorchid")
+        NONBREEDING = "NonBreeding", _("NonBreeding")
+
+    class ReproductiveStatusChoices(models.TextChoices):
+        UNKNOWN = "Unknown", _("Unknown")
+        NOTCYCLING = "NotCycling", _("NotCycling")
+        PREGNANT = "Pregnant", _("Pregnant")
+        EMPTY = "Empty", _("Empty")
+        INVOLUTING = "Involuting", _("Involuting")
+
+    current_location_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Current Location ID'),
+        null=True,
+        blank=True,
+        help_text=_(
+            'Current location ID on the agriwebb,An internal AgriWebb ID representing the animals location, be that of a paddock, pen, yard, feedlot, vegetation, laneway etc'
+        ),
+    )
+    on_farm = models.BooleanField(
+        verbose_name=_('On Farm'),
+        default=False,
+        help_text=_("Indication of whether this animal is currently on or off-farm.")
+    )
+    on_farm_date = models.DateTimeField(
+        verbose_name=_('On Farm Date'),
+        null=True,
+        blank=True,
+        help_text=_('On Farm Date on the agriwebb'),
+    )
+    Last_seen = models.DateTimeField(
+        verbose_name=_('Last Seen'),
+        null=True,
+        blank=True,
+        help_text=_('Last Seen on the agriwebb'),
+    )
+    days_reared = models.IntegerField(
+        verbose_name=_('Days Reared'),
+        blank=True,
+        null=True,
+        help_text=_('Days Reared on the agriwebb,'),
+    )
+    off_farm_date = models.DateTimeField(
+        verbose_name=_('Off Farm Date'),
+        null=True,
+        blank=True,
+        help_text=_('Off Farm Date on the agriwebb'),
+    )
+    disposal_method = models.CharField(
+        max_length=255,
+        verbose_name=_('Disposal Method'),
+        null=True,
+        blank=True,
+        help_text=_(
+            'Disposal Method on the agriwebb,Indicates the disposal method for an animal that is dead. This may be Null if the animal is alive or disposal method is unknown.'
+        ),
+    )
+    fate = models.CharField(
+        max_length=16,
+        verbose_name=_('Fate'),
+        null=True,
+        blank=True,
+        choices=FateChoices.choices,
+        help_text=_("Fate on the agriwebb"),
+    )
+    fertility_status = models.CharField(
+        max_length=255,
+        verbose_name=_('Fertility Status'),
+        null=True,
+        blank=True,
+        choices=FertilityStatusChoices.choices,
+        help_text=_('Fertility Status on the agriwebb'),
+    )
+    rearing_rank = models.FloatField(
+        verbose_name=_('Rearing Rank'),
+        null=True,
+        blank=True,
+        help_text=_('Rearing Rank on the agriwebb'),
+    )
+    reproductive_status = models.CharField(
+        max_length=20,
+        verbose_name=_('Reproductive Status'),
+        null=True,
+        blank=True,
+        choices=ReproductiveStatusChoices.choices,
+        help_text=_('Reproductive Status on the agriwebb'),
+    )
+    status_date = models.DateTimeField(
+        verbose_name=_('Status Date'),
+        null=True,
+        blank=True,
+        help_text=_('Status Date on the agriwebb'),
+    )
+    withholding_date_meat = models.DateTimeField(
+        verbose_name=_('Withholding Date Meat'),
+        null=True,
+        blank=True,
+        help_text=_('Withholding Date Meat on the agriwebb'),
+    )
+    withholding_date_export = models.DateTimeField(
+        verbose_name=_('Withholding Date Export'),
+        null=True,
+        blank=True,
+        help_text=_('Withholding Date Export on the agriwebb'),
+    )
+    withholding_date_organic = models.DateTimeField(
+        verbose_name=_('Withholding Date Organic'),
+        null=True,
+        blank=True,
+        help_text=_('Withholding Date Organic on the agriwebb'),
+    )
+    weaned = models.BooleanField(
+        verbose_name=_('Weaned'),
+        default=False,
+        help_text=_('Weaned on the agriwebb'),
+    )
+    offspring_count = models.FloatField(
+        verbose_name=_('Offspring Count'),
+        null=True,
+        blank=True,
+        help_text=_('Offspring count on the agriwebb'),
+    )
+    weights = models.ForeignKey(
+        "AnimalWeightSummary",
+        verbose_name=_('Weights'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Weights on the agriwebb'),
+    )
+    body_condition_score = models.ForeignKey(
+        "ConditionScore",
+        verbose_name=_('Body Condition Score'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Body Condition Score on the agriwebb'),
+    )
+    body_condition_score_date = models.DateTimeField(
+        verbose_name=_('Body Condition Score Date'),
+        null=True,
+        blank=True,
+        help_text=_('Body Condition Score Date on the agriwebb'),
+    )
+    animal_units = models.ForeignKey(
+        "AnimalUnit",
+        verbose_name=_('Animal Units'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Animal Units on the agriwebb'),
+    )
+    has_had_offspring = models.BooleanField(
+        verbose_name=_('Has Had Offspring'),
+        default=False,
+        help_text=_('Has Had Offspring on the agriwebb'),
+    )
+
+
+class ConditionScore(models.Model):
+    class UnitChoices(models.TextChoices):
+        BCS5 = "bcs5", _("BCS5")
+        BCS9 = "bcs9", _("BCS9")
+
+    unit = models.CharField(
+        max_length=16,
+        verbose_name=_('Unit'),
+        choices=UnitChoices.choices,
+        null=False,
+        blank=False,
+        help_text=_('Condition score Unit on the agriwebb'),
+    )
+    value = models.FloatField(
+        verbose_name=_('Value'),
+        null=False,
+        blank=False,
+        help_text=_('Condition score Value on the agriwebb'),
+    )
+
+
+class AnimalUnit(models.Model):
+    class UnitChoices(models.TextChoices):
+        DSE = "dse", _("DSE")
+        AE = "ae", _("AE")
+        LSU = "lsu", _("LSU")
+        AU = "au", _("AU")
+        MJPERDAY = "MJPerDay", _("MJ Per Day")
+
+    unit = models.CharField(
+        max_length=16,
+        verbose_name=_('Unit'),
+        choices=UnitChoices.choices,
+        null=False,
+        blank=False,
+        help_text=_('Unit on the agriwebb'),
+    )
+    value = models.FloatField(
+        verbose_name=_('Value'),
+        null=False,
+        blank=False,
+        help_text=_('Value on the agriwebb'),
+    )
+
+
+class WeightGain(models.Model):
+    class UnitChoices(models.TextChoices):
+        KGPERDAY = "kgPerDay", _("Kg Per Day")
+        GRAMPERDAY = "gramPerDay", _("Gram Per Day")
+        OZPERDAY = "ozPerDay", _("Oz Per Day")
+        LBPERDAY = "lbPerDay", _("Lb Per Day")
+
+    unit = models.CharField(
+        max_length=16,
+        verbose_name=_('Unit'),
+        choices=UnitChoices.choices,
+        null=False,
+        blank=False,
+        help_text=_('Weight Unit on the agriwebb'),
+    )
+    value = models.FloatField(
+        verbose_name=_('Weight Gain Value'),
+        null=False,
+        blank=False,
+        help_text=_('Weight Gain Value on the agriwebb'),
+    )
+
+
+class Weight(models.Model):
+    class UnitChoices(models.TextChoices):
+        UG = "ug", _("Ug")
+        MG = "mg", _("Mg")
+        GRAM = "gram", _("Gram")
+        KG = "kg", _("Kg")
+        TONNE = "tonne", _("Tonne")
+        OZ = "oz", _("Oz")
+        LB = "lb", _("Lb")
+        TON = "ton", _("Ton")
+        STONE = "stone", _("Stone")
+        LONGTON = "longton", _("Longton")
+
+    unit = models.CharField(
+        max_length=16,
+        verbose_name=_('Unit'),
+        choices=UnitChoices.choices,
+        null=False,
+        blank=False,
+        help_text=_('Weight Unit on the agriwebb'),
+    )
+    value = models.FloatField(
+        verbose_name=_('Weight Value'),
+        null=False,
+        blank=False,
+        help_text=_('Weight Value on the agriwebb'),
+    )
+
+
+class AnimalWeightSummary(models.Model):
+    live_average_daily_gain = models.ForeignKey(
+        WeightGain,
+        verbose_name=_('Live Average Daily Gain'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("Live Average Daily Gain on the agriwebb"),
+    )
+    overall_average_daily_gain = models.ForeignKey(
+        WeightGain,
+        verbose_name=_('Overall Average Daily Gain'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("Overall Average Daily Gain on the agriwebb"),
+    )
+    assumed_average_daily_gain = models.ForeignKey(
+        WeightGain,
+        verbose_name=_('Assumed Average Daily Gain'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("Assumed Average Daily Gain on the agriwebb"),
+    )
+    live_weight_date = models.DateTimeField(
+        verbose_name=_('Live Weight Date'),
+        null=True,
+        blank=True,
+        help_text=_('Live Weight Date on the agriwebb'),
+    )
+    live_weight = models.ForeignKey(
+        Weight,
+        verbose_name=_('Live Weight'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Live Weight Date on the agriwebb'),
+    )
+    estimated_weight = models.ForeignKey(
+        Weight,
+        verbose_name=_('Estimated Weight'),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_('Estimated Weight on the agriwebb'),
     )
