@@ -3,7 +3,7 @@ import {ID, Int, Timestamp} from "./scalers";
 import {
     AgeClass,
     AnimalFate, AnimalParentType,
-    AnimalTagState, AnimalUnitType, ConditionScoreType,
+    AnimalTagState, AnimalTagType, AnimalUnitType, ConditionScoreType,
     Confidence,
     DateAccuracy,
     FertilityStatus, ReproductiveStatus,
@@ -63,7 +63,7 @@ interface AnimalTag {
     healthId?: string;
     tagId?: string;
     tagColorCatalogueId?: string;
-    type?: TagType;
+    type?: AnimalTagType;
     state?: AnimalTagState;
     removalDate?: number;
     replacementDate?: number;
@@ -75,7 +75,7 @@ interface AnimalCharacteristics {
     birthDateConfidence?: DateConfidence;
     birthDateAccuracy?: DateAccuracy;
     birthLocationId?: string;
-    birthYear?: number;
+    birthYear?: Int;
     breedAssessed?: string;
     visualColor?: string;
     sex?: Sex;

@@ -69,10 +69,33 @@ export enum TagType {
     DNAID = "DNAID"
 }
 
+export enum AnimalTagType {
+    generic = "generic",
+    nlis = "nlis",
+    aphis = "aphis",
+    bcms = "bcms",
+    scot_moves = "scot_moves",
+    uk_sheep = "uk_sheep",
+    eid = "eid",
+    vid = "vid",
+    eid_and_vid = "eid_and_vid",
+    uhf = "uhf",
+    bolus = "bolus",
+    slaughter = "slaughter",
+    breed_society = "breed_society",
+    dna = "dna",
+    health = "health",
+    trich = "trich",
+    group = "group",
+    group_management = "group_management",
+    management = "management",
+}
+
+
 export enum AnimalTagState {
-    Active = "Active",
-    Removed = "Removed",
-    Replaced = "Replaced"
+    Active = "active",
+    Removed = " removed",
+    Replaced = " replaced"
 }
 
 export enum AgeClass {
