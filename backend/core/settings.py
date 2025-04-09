@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'django.contrib.gis',
+    'django.contrib.postgres',
 ]
 INSTALLED_APPS += LOCAL_APPS
 INSTALLED_APPS += THIRD_PARTY_APPS
