@@ -197,6 +197,7 @@ class AgriWebb:
         }
 
         return self.get_graphql_data(token_id, query, variables)
+
     def farms(self, token_id, farm_ids=None):
         """
         Retrieves the list of farms from the AgriWebb GraphQL API.
@@ -223,7 +224,17 @@ class AgriWebb:
 
         return self.get_graphql_data(token_id, query, variables)
 
-    def animals_with_count(self, token_id, farm_id, filter=None, sort=None, limit=None, skip=None, observation_date=None, capabilities=None):
+    def animals_with_count(
+            self,
+            token_id,
+            farm_id,
+            filter=None,
+            sort=None,
+            limit=None,
+            skip=None,
+            observation_date=None,
+            capabilities=None
+    ):
         """
         Retrieves the list of animals with a count from the AgriWebb GraphQL API.
 
