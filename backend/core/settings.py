@@ -333,3 +333,11 @@ if not DEBUG:
     }
 
 STATIC_VERSION = "1"
+
+# AgriWebb settings
+AGRIWEBB_CLIENT_ID = 'client-id'
+AGRIWEBB_CLIENT_SECRET = 'client-secret'
+AGRIWEBB_REDIRECT_URI = SERVER_DOMAIN + "/oauth2/callback/"
+AGRIWEBB_TOKEN_URL = 'https://auth.agriwebb.com/oauth/token'
+AGRIWEBB_AUTHORIZATION_URL = 'https://auth.agriwebb.com/oauth/authorize'
+AGRIWEBB_API_URL = 'https://api.agriwebb.com/graphql'
