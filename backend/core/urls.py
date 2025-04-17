@@ -24,6 +24,7 @@ from .views import set_language
 
 urlpatterns = [
     path('', include('account.urls', namespace='account')),
+    path('', include('main.urls', namespace='main')),
     path('admin/', admin.site.urls),
 
 ]
