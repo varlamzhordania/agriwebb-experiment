@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from core.models import Record
+from .record import Record
 
 
 class AnimalRecord(Record):

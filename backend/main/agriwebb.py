@@ -1,9 +1,9 @@
 import requests
 
-from urllib.error import HTTPError
-
-from requests_oauthlib import OAuth2Session
 from django.conf import settings
+from django.urls import reverse
+from urllib.error import HTTPError
+from requests_oauthlib import OAuth2Session
 
 from .models.auth import AgriWebbToken
 
@@ -11,12 +11,12 @@ from .models.auth import AgriWebbToken
 class AgriWebb:
     def __init__(
             self,
-            client_id=settings.AGRIWEBB_CLIENT_ID,
-            client_secret=settings.AGRIWEBB_CLIENT_SECRET,
-            redirect_uri=settings.AGRIWEBB_REDIRECT_URI,
-            token_url=settings.AGRIWEBB_TOKEN_URL,
-            authorization_url=settings.AGRIWEBB_AUTHORIZATION_URL,
-            api_url=settings.AGRIWEBB_API_URL,
+            client_id=None,
+            client_secret=None,
+            redirect_uri=None,
+            token_url=None,
+            authorization_url=None,
+            api_url=None,
     ):
         """
         Initializes the AgriWebb class.
@@ -28,12 +28,51 @@ class AgriWebb:
         :param authorization_url: The URL where users are redirected to authorize access
         :param api_url: URL of the AgriWebb GraphQL API
         """
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.redirect_uri = redirect_uri
-        self.token_url = token_url
-        self.authorization_url = authorization_url
-        self.api_url = api_url
+        self.client_id = client_id or getattr(settings, 'AGRIWEBB_CLIENT_ID', None)
+        if not self.client_id:
+            raise ValueError("AGRIWEBB_CLIENT_ID is required")
+
+        self.client_secret = client_secret or getattr(settings, 'AGRIWEBB_CLIENT_SECRET', None)
+        if not self.client_secret:
+            raise ValueError("AGRIWEBB_CLIENT_SECRET is required")
+
+        if redirect_uri:
+            self.redirect_uri = redirect_uri
+        else:
+            reverse_name = getattr(settings, 'AGRIWEBB_REDIRECT_URI', None)
+            if not reverse_name:
+                raise ValueError("AGRIWEBB_REDIRECT_URI (reverse name) is required")
+            try:
+                redirect_path = reverse(reverse_name)
+            except Exception as e:
+                raise ValueError(f"Could not resolve redirect URI with name '{reverse_name}': {e}")
+
+            base_url = getattr(settings, 'SERVER_DOMAIN', None) or getattr(
+                settings,
+                'ADMIN_URL',
+                None
+            )
+            if not base_url:
+                raise ValueError("SERVER_DOMAIN or ADMIN_URL must be defined in settings")
+
+            self.redirect_uri = base_url + redirect_path
+
+        self.token_url = token_url or getattr(settings, 'AGRIWEBB_TOKEN_URL', None)
+        if not self.token_url:
+            raise ValueError("AGRIWEBB_TOKEN_URL is required")
+
+        self.authorization_url = authorization_url or getattr(
+            settings,
+            'AGRIWEBB_AUTHORIZATION_URL',
+            None
+        )
+        if not self.authorization_url:
+            raise ValueError("AGRIWEBB_AUTHORIZATION_URL is required")
+
+        self.api_url = api_url or getattr(settings, 'AGRIWEBB_API_URL', None)
+        if not self.api_url:
+            raise ValueError("AGRIWEBB_API_URL is required")
+
         self.token = None
 
     def get_authorization_url(self, organization=None):
@@ -117,7 +156,7 @@ class AgriWebb:
             raise ValueError("Token not found")
 
         headers = {
-            "Authorization": f"{token.token_type or "Bearer"} {token.access_token}",
+            "Authorization": f"{token.token_type or 'Bearer'} {token.access_token}",
             "Content-Type": "application/json"
         }
 
