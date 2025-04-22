@@ -192,7 +192,7 @@ class Animal(models.Model):
         null=True,
         help_text=_('Sale Record ID on the agriwebb'),
     )
-    _observation_date = models.DateTimeField(
+    observation_date = models.DateTimeField(
         verbose_name=_('Observation Date'),
         blank=True,
         null=True,
