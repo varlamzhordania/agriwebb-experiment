@@ -95,29 +95,29 @@ def fetch_and_store_animals_data(
                 defaults={
                     'name': animal_identity['name'],
                     'vid': animal_identity.get('vid', ''),
-                    'management_tag': animal_identity.get('management_tag', ''),
+                    'management_tag': animal_identity.get('managementTag', ''),
                     'brand': animal_identity.get('brand', ''),
                     'tattoo': animal_identity.get('tattoo', ''),
-                    'tag_color_catalogue_id': animal_identity.get('tag_color_catalogue_id', ''),
+                    'tag_color_catalogue_id': animal_identity.get('tagColorCatalogueId', ''),
                 }
             )
 
             ## Reminder: check what is the result of birth_date_confidence and make it before creating the characteristics
             # Fetch or create the AnimalCharacteristics
             animal_characteristics = animal['characteristics']
-            birth_date_confidence = animal_characteristics['birth_date_confidence']
+            birth_date_confidence = animal_characteristics['birthDateConfidence']
             characteristics, _ = AnimalCharacteristics.objects.get_or_create(
-                birth_date=animal_characteristics['birth_date'],
+                birth_date=animal_characteristics['birthDate'],
                 defaults={
-                    'age_class': animal_characteristics.get('age_class', ''),
+                    'age_class': animal_characteristics.get('ageClass', ''),
                     'birth_date_confidence': '',
-                    'birth_date_accuracy': animal_characteristics.get('birth_date_accuracy', ''),
-                    'birth_location_id': animal_characteristics.get('birth_location_id', ''),
-                    'birth_year': animal_characteristics.get('birth_year', ''),
-                    'breed_assessed': animal_characteristics.get('breed_assessed', ''),
-                    'visual_color': animal_characteristics.get('visual_color', ''),
+                    'birth_date_accuracy': animal_characteristics.get('birthDateAccuracy', ''),
+                    'birth_location_id': animal_characteristics.get('birthLocationId', ''),
+                    'birth_year': animal_characteristics.get('birthYear', ''),
+                    'breed_assessed': animal_characteristics.get('breedAssessed', ''),
+                    'visual_color': animal_characteristics.get('visualColor', ''),
                     'sex': animal_characteristics.get('sex', ''),
-                    'species_common_name': animal_characteristics.get('species_common_name', ''),
+                    'species_common_name': animal_characteristics.get('speciesCommonName', ''),
 
                 }
             )
@@ -130,30 +130,29 @@ def fetch_and_store_animals_data(
             ## Reminder: this three field are foreignkey, have to be populated before (weights,body_condition_score,animal_units)
             animal_state = animal['state']
             state, _ = AnimalState.objects.get_or_create(
-                fate=animal['state']['fate'],
                 defaults={
-                    'current_location_id': animal_state.get('current_location_id', ''),
-                    'on_farm': animal_state.get('on_farm', ''),
-                    'on_farm_date': animal_state.get('on_farm_date', ''),
-                    'Last_seen': animal_state.get('Last_seen', ''),
-                    'days_reared': animal_state.get('days_reared', ''),
-                    'off_farm_date': animal_state.get('off_farm_date', ''),
-                    'disposal_method': animal_state.get('disposal_method', ''),
+                    'current_location_id': animal_state.get('currentLocationId', ''),
+                    'on_farm': animal_state.get('onFarm', ''),
+                    'on_farm_date': animal_state.get('onFarmDate', ''),
+                    'Last_seen': animal_state.get('LastSeen', ''),
+                    'days_reared': animal_state.get('daysReared', ''),
+                    'off_farm_date': animal_state.get('offFarmDate', ''),
+                    'disposal_method': animal_state.get('disposalMethod', ''),
                     'fate': animal_state.get('fate', ''),
-                    'fertility_status': animal_state.get('fertility_status', ''),
-                    'rearing_rank': animal_state.get('rearing_rank', ''),
-                    'reproductive_status': animal_state.get('reproductive_status', ''),
-                    'status_date': animal_state.get('status_date', ''),
-                    'withholding_date_meat': animal_state.get('withholding_date_meat', ''),
-                    'withholding_date_export': animal_state.get('withholding_date_export', ''),
-                    'withholding_date_organic': animal_state.get('withholding_date_organic', ''),
+                    'fertility_status': animal_state.get('fertilityStatus', ''),
+                    'rearing_rank': animal_state.get('rearingRank', ''),
+                    'reproductive_status': animal_state.get('reproductiveStatus', ''),
+                    'status_date': animal_state.get('statusDate', ''),
+                    'withholding_date_meat': animal_state.get('withholdingDateMeat', ''),
+                    'withholding_date_export': animal_state.get('withholdingDateExport', ''),
+                    'withholding_date_organic': animal_state.get('withholdingDateOrganic', ''),
                     'weaned': animal_state.get('weaned', ''),
-                    'offspring_count': animal_state.get('offspring_count', ''),
+                    'offspring_count': animal_state.get('offspringCount', ''),
                     # 'weights': animal_state.get('weights', ''),
-                    # 'body_condition_score': animal_state.get('body_condition_score', ''),
-                    'body_condition_score_date': animal_state.get('body_condition_score_date', ''),
-                    # 'animal_units': animal_state.get('animal_units', ''),
-                    'has_had_offspring': animal_state.get('has_had_offspring', ''),
+                    # 'body_condition_score': animal_state.get('bodyConditionScore', ''),
+                    'body_condition_score_date': animal_state.get('bodyConditionScoreDate', ''),
+                    # 'animal_units': animal_state.get('animalUnits', ''),
+                    'has_had_offspring': animal_state.get('hasHadOffspring', ''),
                 }
             )
 
