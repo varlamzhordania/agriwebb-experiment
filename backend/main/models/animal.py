@@ -201,6 +201,13 @@ class Animal(models.Model):
 
 
 class AnimalIdentity(models.Model):
+    animal_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Animal ID'),
+        blank=True,
+        null=True,
+        help_text=_('Animal ID on the inner tables, made manually for better query'),
+    )
     name = models.CharField(
         max_length=255,
         verbose_name=_('Name'),
@@ -317,14 +324,14 @@ class AnimalTag(models.Model):
             'Management Tag on the agriwebb, Visual label used for on farm management, which is not guaranteed to be unique.'
         ),
     )
-    uhfEid = models.CharField(
+    uhf_eid = models.CharField(
         max_length=255,
         verbose_name=_('UHF EID'),
         blank=True,
         null=True,
         help_text=_('UHF EID on the agriwebb'),
     )
-    dnaId = models.CharField(
+    dna_id = models.CharField(
         max_length=255,
         verbose_name=_('DNA ID'),
         blank=True,
@@ -338,14 +345,14 @@ class AnimalTag(models.Model):
         null=True,
         help_text=_('Registration Number on the agriwebb'),
     )
-    breedSocietyId = models.CharField(
+    breed_society_id = models.CharField(
         max_length=255,
         verbose_name=_('Breed Society ID'),
         blank=True,
         null=True,
         help_text=_('Breed Society ID on the agriwebb'),
     )
-    healthId = models.CharField(
+    health_id = models.CharField(
         max_length=255,
         verbose_name=_('Health ID'),
         blank=True,
@@ -408,6 +415,13 @@ class AnimalCharacteristics(models.Model):
         FEMALE = "female", _("Female")
         UNSPECIFIED = "unspecified", _("Unspecified")
 
+    animal_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Animal ID'),
+        blank=True,
+        null=True,
+        help_text=_('Animal ID on the inner tables, made manually for better query'),
+    )
     age_class = models.CharField(
         max_length=255,
         choices=SharedAgeClassChoices.choices,
@@ -694,6 +708,13 @@ class AnimalState(models.Model):
         EMPTY = "Empty", _("Empty")
         INVOLUTING = "Involuting", _("Involuting")
 
+    animal_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Animal ID'),
+        blank=True,
+        null=True,
+        help_text=_('Animal ID on the inner tables, made manually for better query'),
+    )
     current_location_id = models.CharField(
         max_length=255,
         verbose_name=_('Current Location ID'),
@@ -986,4 +1007,47 @@ class AnimalWeightSummary(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         help_text=_('Estimated Weight on the agriwebb'),
+    )
+
+
+class AnimalCount(models.Model):
+    farm_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Farm ID'),
+        null=True,
+        blank=True,
+        help_text=_(
+            'Farm ID on the agriwebb, this field is added manually for better query and is not on the result of query'
+        ),
+    )
+    non_paged_count = models.IntegerField(
+        verbose_name=_('Non-Paged Count'),
+        null=True,
+        blank=True,
+        help_text=_('Number of filtered animals before applying skip and limit'),
+    )
+    animals = models.ManyToManyField(
+        Animal,
+        verbose_name=_('Animals'),
+        blank=True,
+        help_text=_('Result animals on the agriwebb'),
+    )
+    count = models.IntegerField(
+        verbose_name=_('Count'),
+        default=0,
+        null=False,
+        blank=False,
+        help_text=_('Number of filtered animals before applying skip and limit'),
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_('Created at'),
+        auto_now_add=True,
+        blank=True,
+        null=True
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_('Updated at'),
+        auto_now=True,
+        blank=True,
+        null=True
     )
