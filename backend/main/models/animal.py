@@ -526,6 +526,13 @@ class DateConfidence(models.Model):
 
 
 class ParentAnimalIdentity(models.Model):
+    parent_animal_id = models.CharField(
+        max_length=255,
+        verbose_name=_('Parent Animal ID'),
+        null=True,
+        blank=True,
+        help_text=_('Parent Animal ID on the agriwebb'),
+    )
     eid = models.CharField(
         max_length=255,
         verbose_name=_('EID'),

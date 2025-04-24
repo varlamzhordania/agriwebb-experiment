@@ -1,6 +1,7 @@
 from .models import Animal, AnimalIdentity, AnimalCharacteristics, Parentage, AnimalState, \
     AnimalRecord, ManagementGroup, Enterprise, AnimalTag, DateConfidence, AnimalWeightSummary, \
-    WeightGain, Weight, ConditionScore, AnimalUnit
+    WeightGain, Weight, ConditionScore, AnimalUnit, GeneticParent, ParentAnimalIdentity, Surrogate, \
+    AnimalParent
 
 
 def populate_animal(animal, farm_id):
@@ -80,8 +81,77 @@ def populate_animal(animal, farm_id):
         }
     )
 
-    animal_parentage = animal['parentage']
-    ## Reminder: fill this section when get the data example
+    animal_parentage = animal.get('parentage', {})
+    sires_data = animal_parentage.get('sires', [])
+    dams_data = animal_parentage.get('dams', [])
+    parentage = Parentage()
+
+    for dam in dams_data:
+        parent_animal_identity_data = dam.get('parentAnimalIdentity', {})
+        parent_animal_id = dam.get('parentAnimalId')
+        parent_animal_identity_obj, _ = ParentAnimalIdentity.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'eid': parent_animal_identity_data.get('eid', ''),
+                'vid': parent_animal_identity_data.get('vid', ''),
+                'name': parent_animal_identity_data.get('name', ''),
+            }
+        )
+
+        dam_obj, _ = GeneticParent.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'parent_animal_identity': parent_animal_identity_obj,
+                'parent_type': dam.get('parentType', AnimalParent.AnimalParentType.DAM),
+            }
+        )
+        parentage.dams.add(dam_obj)
+
+    for sire in sires_data:
+        parent_animal_identity_data = sire.get('parentAnimalIdentity', {})
+        parent_animal_id = sire.get('parentAnimalId')
+        parent_animal_identity_obj, _ = ParentAnimalIdentity.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'eid': parent_animal_identity_data.get('eid', ''),
+                'vid': parent_animal_identity_data.get('vid', ''),
+                'name': parent_animal_identity_data.get('name', ''),
+            }
+        )
+
+        sire_obj, _ = GeneticParent.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'parent_animal_identity': parent_animal_identity_obj,
+                'parent_type': sire.get('parentType', AnimalParent.AnimalParentType.SIRE),
+            }
+        )
+        parentage.sires.add(sire_obj)
+
+    surrogate_data = animal_parentage.get('surrogate', {})
+    if surrogate_data:
+        parent_animal_identity_data = surrogate_data.get('parentAnimalIdentity', {})
+        parent_animal_id = surrogate_data.get('parentAnimalId')
+
+        parent_animal_identity_obj, _ = ParentAnimalIdentity.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'eid': parent_animal_identity_data.get('eid', ''),
+                'vid': parent_animal_identity_data.get('vid', ''),
+                'name': parent_animal_identity_data.get('name', ''),
+            }
+        )
+
+        surrogate_obj, _ = Surrogate.objects.update_or_create(
+            parent_animal_id=parent_animal_id,
+            defaults={
+                'parent_animal_identity': parent_animal_identity_obj,
+                'parent_type': surrogate_data.get('parentType', AnimalParent.AnimalParentType.UNKNOWN),
+            }
+        )
+        parentage.surrogate = surrogate_obj
+
+    parentage.save()
 
     animal_state = animal.get('state', {})
     weights_data = animal_state.get('weights', {})
@@ -211,7 +281,7 @@ def populate_animal(animal, farm_id):
             'identity': identity,
             'age_class': animal.get('ageClass', ''),
             'characteristics': characteristics,
-            # 'parentage': parentage,
+            'parentage': parentage,
             'management_group': management_group,
             'enterprise': enterprise,
             'farm_id': farm_id,
